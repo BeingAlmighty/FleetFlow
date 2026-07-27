@@ -85,7 +85,7 @@ const columns = [
       return (
         <Badge variant="outline" className={
           status === 'Available' ? 'border-success/50 text-success bg-success/10' : 
-          status === 'Alloted' ? 'border-muted-foreground/50 text-muted-foreground bg-muted/50' :
+          status === 'Unavailable' ? 'border-muted-foreground/50 text-muted-foreground bg-muted/50' :
           'border-warning/50 text-warning bg-warning/10'
         }>
           {status}

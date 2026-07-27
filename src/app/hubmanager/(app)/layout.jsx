@@ -1,7 +1,20 @@
+"use client";
 import { HubManagerBottomNav } from "@/components/layout/HubManagerBottomNav";
 import { User, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { syncOfflineMutations } from "@/lib/offline/sync";
+
 export default function GuardLayout({ children }) {
+  useEffect(() => {
+    // Initial sync check when app loads
+    syncOfflineMutations();
+
+    // Setup listener for coming back online
+    window.addEventListener('online', syncOfflineMutations);
+    return () => window.removeEventListener('online', syncOfflineMutations);
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground pb-16 relative">
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between px-4 border-b border-border bg-card">

@@ -25,7 +25,7 @@ export function useDashboard() {
       
       const totalRev = payments?.reduce((acc, curr) => acc + curr.amount, 0) || 0;
       const availableCount = allVehicles?.filter(v => v.status === 'Available').length || 0;
-      const allotedCount = allVehicles?.filter(v => v.status === 'Alloted').length || 0;
+      const allotedCount = allVehicles?.filter(v => v.status === 'Unavailable').length || 0;
       const maintCount = allVehicles?.filter(v => v.status === 'Maintenance').length || 0;
       
       return {

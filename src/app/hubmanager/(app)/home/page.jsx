@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CarFront, IndianRupee, ScanLine, Loader2 } from "lucide-react";
@@ -74,11 +74,11 @@ export default function HubManagerHomePage() {
             ) : (
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-2xl font-bold text-foreground">â‚¹{stats.cash}</p>
+                  <p className="text-2xl font-bold text-foreground">₹{stats.cash}</p>
                   <p className="text-xs text-muted-foreground mt-1">Total Cash</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">â‚¹{stats.upi}</p>
+                  <p className="text-2xl font-bold text-foreground">₹{stats.upi}</p>
                   <p className="text-xs text-muted-foreground mt-1">Total UPI</p>
                 </div>
               </div>
