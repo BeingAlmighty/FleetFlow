@@ -24,7 +24,7 @@ export default function HubManagerCheckoutPage() {
   const [fetching, setFetching] = useState(true);
   const [availableVehicles, setAvailableVehicles] = useState([]);
   const [availableDrivers, setAvailableDrivers] = useState([]);
-  const [isOffline, setIsOffline] = useState(false);
+  const [isOffline, setIsOffline] = useState(() => typeof window !== 'undefined' ? !navigator.onLine : false);
   const supabase = createClient();
   
   const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm({
@@ -38,7 +38,6 @@ export default function HubManagerCheckoutPage() {
   });
 
   useEffect(() => {
-    setIsOffline(!navigator.onLine);
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
     window.addEventListener('online', handleOnline);

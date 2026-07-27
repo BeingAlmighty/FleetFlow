@@ -44,11 +44,17 @@ export async function syncOfflineMutations() {
         updates.push(supabase.from('drivers').update({ status: 'Active', vehicle_id: payload.vehicleId }).eq('id', payload.driverId));
       }
       
-      await Promise.all(updates);
-      await removeMutation(id);
+      const results = await Promise.all(updates);
+      const hasError = results.some(res => res.error);
+      
+      if (!hasError) {
+        await removeMutation(id);
+      } else {
+        console.error('Failed to sync mutation to Supabase, keeping in queue:', results.map(r => r.error));
+      }
     }
     
-    console.log(`Successfully synced ${pending.length} offline mutations!`);
+    console.log(`Finished processing ${pending.length} offline mutations!`);
   } catch (error) {
     console.error('Failed to sync offline mutations:', error);
   } finally {

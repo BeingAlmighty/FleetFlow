@@ -64,7 +64,7 @@ export default function HubManagerHomePage() {
         <Card className="col-span-2 border-border shadow-sm bg-primary/5 border-primary/20">
           <CardContent className="p-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-sm font-medium text-primary">Today's Collection</h2>
+              <h2 className="text-sm font-medium text-primary">Today&apos;s Collection</h2>
               <IndianRupee className="w-4 h-4 text-primary" />
             </div>
             {loading ? (

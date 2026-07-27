@@ -26,7 +26,7 @@ export default function GuardCheckinPage() {
   const [vehicles, setVehicles] = useState([]);
   const [drivers, setDrivers] = useState({});
   const [selectedVehicle, setSelectedVehicle] = useState(null);
-  const [isOffline, setIsOffline] = useState(false);
+  const [isOffline, setIsOffline] = useState(() => typeof window !== 'undefined' ? !navigator.onLine : false);
   const supabase = createClient();
   
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
@@ -38,7 +38,6 @@ export default function GuardCheckinPage() {
   });
 
   useEffect(() => {
-    setIsOffline(!navigator.onLine);
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
     window.addEventListener('online', handleOnline);

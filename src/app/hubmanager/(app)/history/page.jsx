@@ -92,7 +92,7 @@ export default function GuardHistoryPage() {
                           </p>
                           {record.remarks && (
                             <p className="text-[11px] text-muted-foreground bg-muted p-1.5 rounded-md mt-1 italic">
-                              "{record.remarks}"
+                              &quot;{record.remarks}&quot;
                             </p>
                           )}
                         </div>
