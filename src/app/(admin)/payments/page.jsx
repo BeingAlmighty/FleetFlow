@@ -1,39 +1,14 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { usePayments } from "@/features/payments/hooks/usePayments";
 import { Search, FileDown, IndianRupee, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { createClient } from "@/utils/supabase/client";
 export default function PaymentsPage() {
-  const [payments, setPayments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: payments = [], isLoading: loading } = usePayments();
   const [search, setSearch] = useState("");
-  const supabase = createClient();
-  useEffect(() => {
-    async function fetchPayments() {
-      const [
-        { data: payData },
-        { data: drvData }
-      ] = await Promise.all([
-        supabase.from('payments').select('*').order('created_at', { ascending: false }),
-        supabase.from('drivers').select('*')
-      ]);
-      const drvMap = {};
-      if (drvData) {
-        drvData.forEach(d => drvMap[d.id] = d.name);
-      }
-      if (payData) {
-        const enhanced = payData.map(p => ({
-          ...p,
-          driver_name: drvMap[p.driver_id] || p.driver_id
-        }));
-        setPayments(enhanced);
-      }
-      setLoading(false);
-    }
-    fetchPayments();
-  }, []);
   const filteredPayments = payments.filter(p => 
     p.driver_name.toLowerCase().includes(search.toLowerCase()) || 
     p.payment_mode.toLowerCase().includes(search.toLowerCase())

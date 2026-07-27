@@ -1,5 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useHubManagers } from "@/features/hubmanagers/hooks/useHubManagers";
+import { useQueryClient } from "@tanstack/react-query";
 import { Search, FileDown, ShieldCheck, MoreHorizontal, Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,26 +35,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/utils/supabase/client";
 export default function HubManagersPage() {
-  const [HubManagers, setHubManagers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: HubManagers = [], isLoading: loading } = useHubManagers();
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [areaFilter, setAreaFilter] = useState("All");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [manualForm, setManualForm] = useState({ name: "", email: "", password: "", phone: "", area: "" });
+  
+  // Keep the local client for non-fetching ops (we will migrate this next phase)
+  const { createClient } = require('@/utils/supabase/client');
   const supabase = createClient();
-  useEffect(() => {
-    fetchHubManagers();
-  }, []);
-  async function fetchHubManagers() {
-    setLoading(true);
-    const { data: profiles, error } = await supabase
-      .from('profiles')
-      .select('*, vehicles(id)')
-      .in('role', ['hubmanager', 'GUARD']);
-    if (profiles) setHubManagers(profiles);
-    setLoading(false);
-  }
   const handleManualAdd = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -68,7 +61,7 @@ export default function HubManagersPage() {
       }
       setIsAddOpen(false);
       setManualForm({ name: "", email: "", password: "", phone: "", area: "" });
-      fetchHubManagers();
+      queryClient.invalidateQueries({ queryKey: ['hubManagers'] });
     } catch (error) {
       alert("Error adding Hub Manager: " + error.message);
     } finally {

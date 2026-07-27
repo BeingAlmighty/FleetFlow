@@ -1,5 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useDrivers } from "@/features/drivers/hooks/useDrivers";
+import { useQueryClient } from "@tanstack/react-query";
 import { 
   Search, 
   FileDown,
@@ -39,26 +41,17 @@ import { createClient } from "@/utils/supabase/client";
 import { downloadCSV } from "@/utils/csv";
 import { Label } from "@/components/ui/label";
 export default function DriversPage() {
-  const [drivers, setDrivers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: drivers = [], isLoading: loading } = useDrivers();
+  const queryClient = useQueryClient();
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [search, setSearch] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [manualForm, setManualForm] = useState({ name: "", phone: "", license: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Keep local client for non-query ops
+  const { createClient } = require('@/utils/supabase/client');
   const supabase = createClient();
-  useEffect(() => {
-    fetchDrivers();
-  }, []);
-  async function fetchDrivers() {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('drivers')
-      .select('*')
-      .order('name');
-    if (data) setDrivers(data);
-    setLoading(false);
-  }
   const handleManualAdd = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -69,7 +62,7 @@ export default function DriversPage() {
     if (!error) {
       setIsAddOpen(false);
       setManualForm({ name: "", phone: "", license: "" });
-      fetchDrivers();
+      queryClient.invalidateQueries({ queryKey: ['drivers'] });
     } else {
       alert("Error adding driver: " + error.message);
     }
@@ -93,7 +86,7 @@ export default function DriversPage() {
             alert("Error importing CSV: " + error.message);
           } else {
             setIsAddOpen(false);
-            fetchDrivers();
+            queryClient.invalidateQueries({ queryKey: ['drivers'] });
           }
         } else {
           alert("No valid rows found. Ensure columns match the template.");

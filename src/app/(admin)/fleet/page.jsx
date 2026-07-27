@@ -1,5 +1,8 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
+import { useVehicles } from "@/features/vehicles/hooks/useVehicles";
+import { useHubManagers } from "@/features/hubmanagers/hooks/useHubManagers";
+import { useQueryClient } from "@tanstack/react-query";
 import { 
   useReactTable, 
   getCoreRowModel, 
@@ -120,40 +123,16 @@ export default function FleetPage() {
   const [areaFilter, setAreaFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sorting, setSorting] = useState([]);
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [HubManagers, setHubManagers] = useState([]);
+  const { data = [], isLoading: loading } = useVehicles();
+  const { data: HubManagers = [] } = useHubManagers();
+  const queryClient = useQueryClient();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [manualForm, setManualForm] = useState({ number_plate: "", model: "", hubmanager_id: "" });
+  
+  // Keep the local client for mutations (we will migrate this to a TanStack mutation next phase)
+  const { createClient } = require('@/utils/supabase/client');
   const supabase = createClient();
-  useEffect(() => {
-    async function fetchVehicles() {
-      const [
-        { data: vehicles },
-        { data: drivers },
-        { data: profiles }
-      ] = await Promise.all([
-        supabase.from('vehicles').select('*'),
-        supabase.from('drivers').select('*'),
-        supabase.from('profiles').select('id, full_name, area').in('role', ['hubmanager', 'GUARD'])
-      ]);
-      if (profiles) setHubManagers(profiles);
-      const drvMap = {};
-      if (drivers) {
-        drivers.forEach(d => drvMap[d.id] = d.name);
-      }
-      if (vehicles) {
-        const enhanced = vehicles.map(v => ({
-          ...v,
-          last_driver_name: v.last_driver_id ? (drvMap[v.last_driver_id] || v.last_driver_id) : null
-        }));
-        setData(enhanced);
-      }
-      setLoading(false);
-    }
-    fetchVehicles();
-  }, []);
   const handleManualAdd = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -169,7 +148,7 @@ export default function FleetPage() {
     if (!error) {
       setIsAddOpen(false);
       setManualForm({ number_plate: "", model: "", hubmanager_id: "" });
-      window.location.reload(); 
+      queryClient.invalidateQueries({ queryKey: ['vehicles'] }); 
     } else {
       alert("Error adding vehicle: " + error.message);
     }
@@ -197,7 +176,7 @@ export default function FleetPage() {
             alert("Error importing CSV: " + error.message);
           } else {
             setIsAddOpen(false);
-            window.location.reload();
+            queryClient.invalidateQueries({ queryKey: ['vehicles'] });
           }
         } else {
           alert("No valid rows found. Ensure columns match the template (number_plate, model, hubmanager_id).");
