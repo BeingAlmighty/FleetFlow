@@ -16,6 +16,9 @@ export const metadata = {
     title: "FleetGuard",
   },
 };
+export const viewport = {
+  themeColor: "#000000",
+};
 export default function RootLayout({ children }) {
   return (
     <html
