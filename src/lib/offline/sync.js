@@ -1,4 +1,4 @@
-﻿import { getPendingMutations, removeMutation } from './db';
+import { getPendingMutations, removeMutation } from './db';
 import { createClient } from '@/utils/supabase/client';
 
 let isSyncing = false;
@@ -40,7 +40,7 @@ export async function syncOfflineMutations() {
           payment_mode: payload.paymentMode,
           remarks: payload.remarks
         }));
-        updates.push(supabase.from('vehicles').update({ status: 'Unavailable', last_driver_id: payload.driverId }).eq('id', payload.vehicleId));
+        updates.push(supabase.from('vehicles').update({ status: 'Alloted', last_driver_id: payload.driverId }).eq('id', payload.vehicleId));
         updates.push(supabase.from('drivers').update({ status: 'Active', vehicle_id: payload.vehicleId }).eq('id', payload.driverId));
       }
       

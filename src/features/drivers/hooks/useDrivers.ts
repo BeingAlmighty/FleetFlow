@@ -11,7 +11,10 @@ export function useDrivers() {
         .from('drivers')
         .select('*')
         .order('name');
-      return data || [];
+      return (data || []).map(d => ({
+        ...d,
+        license: d.license_number
+      }));
     }
   });
 }

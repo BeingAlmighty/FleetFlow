@@ -100,6 +100,7 @@ export default function LoginPage() {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                         className="pl-10 h-11 bg-background border-border focus-visible:ring-1 focus-visible:ring-primary" 
+                        suppressHydrationWarning
                       />
                     </div>
                   </div>
@@ -117,6 +118,7 @@ export default function LoginPage() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         className="pl-10 h-11 bg-background border-border focus-visible:ring-1 focus-visible:ring-primary" 
+                        suppressHydrationWarning
                       />
                     </div>
                   </div>

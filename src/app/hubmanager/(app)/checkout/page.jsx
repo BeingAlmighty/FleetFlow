@@ -95,7 +95,7 @@ export default function HubManagerCheckoutPage() {
     }
     
     const updates = [];
-    updates.push(supabase.from('vehicles').update({ status: 'Unavailable', last_driver_id: data.driverId }).eq('id', data.vehicleId));
+    updates.push(supabase.from('vehicles').update({ status: 'Alloted', last_driver_id: data.driverId }).eq('id', data.vehicleId));
     updates.push(supabase.from('drivers').update({ status: 'Active', vehicle_id: data.vehicleId }).eq('id', data.driverId));
     await Promise.all(updates);
     
@@ -147,9 +147,9 @@ export default function HubManagerCheckoutPage() {
                     </div>
                   </SelectTrigger>
                   <SelectContent>
-                    {availableVehicles.map(v => (
-                      <SelectItem key={v.id} value={v.id}>{v.id} • {v.battery_percentage}%</SelectItem>
-                    ))}
+                      {availableVehicles.map(v => (
+                        <SelectItem key={v.id} value={v.id}>{v.number_plate}</SelectItem>
+                      ))}
                     {isOffline && <SelectItem value="OFFLINE-V1">Offline Vehicle (Demo)</SelectItem>}
                   </SelectContent>
                 </Select>
@@ -208,8 +208,8 @@ export default function HubManagerCheckoutPage() {
               name="paymentMode"
               control={control}
               render={({ field }) => (
-                <div className="grid grid-cols-3 gap-2">
-                  {['upi', 'cash', 'wallet'].map((mode) => (
+                <div className="grid grid-cols-2 gap-2">
+                  {['upi', 'cash'].map((mode) => (
                     <div
                       key={mode}
                       onClick={() => field.onChange(mode)}
@@ -244,7 +244,7 @@ export default function HubManagerCheckoutPage() {
         </CardContent>
       </Card>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-xl border-t border-border z-10 pb-6">
+      <div className="fixed bottom-16 left-0 right-0 p-4 bg-background/80 backdrop-blur-xl border-t border-border z-10 pb-6">
         <Button type="submit" size="lg" className="w-full h-14 text-base font-bold shadow-lg shadow-primary/20" disabled={isSubmitting}>
           {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Confirm Check Out"}
         </Button>

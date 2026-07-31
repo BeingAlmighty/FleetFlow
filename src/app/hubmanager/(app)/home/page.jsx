@@ -43,7 +43,7 @@ export default function HubManagerHomePage() {
       let returned = 0;
       if (vehicles) {
         vehicles.forEach(v => {
-          if (v.status === 'Unavailable') dispatched++;
+          if (v.status === 'Alloted') dispatched++;
           if (v.status === 'Available') returned++;
         });
       }

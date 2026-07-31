@@ -166,7 +166,7 @@ export default function GuardCheckinPage() {
                       <CarFront className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg">{v.id}</h3>
+                      <h3 className="font-bold text-lg">{v.number_plate}</h3>
                       <p className="text-xs text-muted-foreground flex items-center gap-1">
                         Driver: <span className="font-medium text-foreground">{drivers[v.last_driver_id]?.name || v.last_driver_id || 'Unknown'}</span>
                       </p>
@@ -189,7 +189,7 @@ export default function GuardCheckinPage() {
               <DialogHeader>
                 <DialogTitle className="text-2xl">Confirm Check-In</DialogTitle>
                 <DialogDescription>
-                  You are checking in vehicle <strong className="text-foreground">{selectedVehicle?.id}</strong>.
+                  You are checking in vehicle <strong className="text-foreground">{selectedVehicle?.number_plate}</strong>.
                 </DialogDescription>
               </DialogHeader>
               
