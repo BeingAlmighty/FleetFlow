@@ -26,6 +26,7 @@ export default function GuardCheckinPage() {
   const [vehicles, setVehicles] = useState([]);
   const [drivers, setDrivers] = useState({});
   const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [lastSyncTime, setLastSyncTime] = useState(null);
   const [isOffline, setIsOffline] = useState(() => typeof window !== 'undefined' ? !navigator.onLine : false);
   const supabase = createClient();
   
@@ -45,8 +46,15 @@ export default function GuardCheckinPage() {
     
     async function fetchActiveVehicles() {
       if (!navigator.onLine) {
+        // Load from cache
+        const cachedV = localStorage.getItem('checkin_vehicles_cache');
+        const cachedD = localStorage.getItem('checkin_drivers_cache');
+        const syncTime = localStorage.getItem('checkin_last_sync');
+        if (cachedV) setVehicles(JSON.parse(cachedV));
+        if (cachedD) setDrivers(JSON.parse(cachedD));
+        if (syncTime) setLastSyncTime(syncTime);
         setLoading(false);
-        return; // Skip fetch if offline
+        return; 
       }
       const { data: guardData } = await supabase.auth.getUser();
       if (!guardData?.user) return;
@@ -61,9 +69,18 @@ export default function GuardCheckinPage() {
         dData.forEach(d => {
           dMap[d.id] = d;
         });
+        setDrivers(dMap);
+        localStorage.setItem('checkin_drivers_cache', JSON.stringify(dMap));
       }
-      setDrivers(dMap);
-      setVehicles(vData || []);
+      if (vData) {
+        setVehicles(vData);
+        localStorage.setItem('checkin_vehicles_cache', JSON.stringify(vData));
+      }
+      
+      const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setLastSyncTime(now);
+      localStorage.setItem('checkin_last_sync', now);
+      
       setLoading(false);
     }
     fetchActiveVehicles();
@@ -136,8 +153,11 @@ export default function GuardCheckinPage() {
           </div>
         </div>
         {isOffline && (
-          <div className="flex items-center text-xs font-semibold text-amber-500 bg-amber-500/10 px-3 py-1.5 rounded-full">
-            <WifiOff className="w-3 h-3 mr-1" /> Offline
+          <div className="flex flex-col items-end">
+            <div className="flex items-center text-xs font-semibold text-amber-500 bg-amber-500/10 px-3 py-1.5 rounded-full">
+              <WifiOff className="w-3 h-3 mr-1" /> Offline
+            </div>
+            {lastSyncTime && <span className="text-[10px] text-muted-foreground mt-1">Last sync: {lastSyncTime}</span>}
           </div>
         )}
       </div>
